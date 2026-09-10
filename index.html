@@ -1,99 +1,525 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Link Key AI</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7fb;color:#17181b}
-.wrap{max-width:760px;margin:auto;padding:22px 14px 40px}
-header{padding:12px 4px 18px}h1{margin:0;font-size:28px}header p{margin:6px 0;color:#666}
-.card{background:white;border:1px solid #e7e9ee;border-radius:18px;padding:16px;margin-top:14px;box-shadow:0 5px 20px rgba(0,0,0,.05)}
-label{font-weight:650;display:block;margin-bottom:8px}.row{display:flex;gap:8px}
-input,textarea{width:100%;border:1px solid #d8dbe2;border-radius:12px;padding:12px;font:inherit;outline:none}
-textarea{min-height:90px;resize:vertical}button{border:0;border-radius:12px;padding:12px 16px;font-weight:650;cursor:pointer;background:#111;color:#fff;white-space:nowrap}
-button:disabled{opacity:.55}.result{margin-top:12px;padding:12px;border-radius:12px;background:#f2f4f7;white-space:pre-wrap;word-break:break-word}
-.chat{min-height:180px;max-height:360px;overflow:auto;background:#fafafa;border-radius:12px;padding:10px;margin-bottom:10px}
-.msg{padding:9px 11px;border-radius:12px;margin:7px 0;white-space:pre-wrap;word-break:break-word}.user{background:#e8eefc;margin-left:20%}.bot{background:#eee;margin-right:20%}
-.small{font-size:13px;color:#777;margin-top:9px;line-height:1.45}
-@media(max-width:560px){.row{flex-direction:column}button{width:100%}.user{margin-left:5%}.bot{margin-right:5%}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Link Key AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 15px 0 20px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    header p {
+      margin: 0;
+      color: #666;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #6366f1;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #111827;
+      color: white;
+      flex: 1;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f9fafb;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .chat {
+      min-height: 180px;
+      max-height: 360px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .msg {
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .user {
+      background: #e5e7eb;
+    }
+
+    .ai {
+      background: #eef2ff;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #777;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    a {
+      color: #2563eb;
+      word-break: break-all;
+    }
+
+    @media (max-width: 560px) {
+      .wrap {
+        padding: 12px;
+      }
+
+      .row {
+        flex-direction: column;
+      }
+
+      header h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
 </head>
+
 <body>
+
 <div class="wrap">
-<header><h1>🔗 Link Key AI</h1><p>Kiểm tra redirect và trò chuyện với AI</p></header>
 
-<section class="card">
-<label for="url">URL cần kiểm tra</label>
-<div class="row">
-<input id="url" type="url" placeholder="https://example.com/...">
-<button id="check">Kiểm tra link</button>
-</div>
-<div id="result" class="result" hidden></div>
-<p class="small">Chỉ phân tích các chuyển hướng công khai. Không vượt CAPTCHA, Cloudflare, anti-bot hoặc cơ chế bảo vệ.</p>
-</section>
+  <header>
+    <h1>🔗 Link Key AI</h1>
+    <p>Kiểm tra và xử lý chuyển hướng link công khai</p>
+  </header>
 
-<section class="card">
-<label>Chatbot AI</label>
-<div id="chat" class="chat"><div class="msg bot">Xin chào! Gửi URL hoặc câu hỏi về link cho mình.</div></div>
-<textarea id="message" placeholder="Ví dụ: Link này có chuyển hướng không?"></textarea>
-<div style="margin-top:8px"><button id="send">Gửi</button></div>
-</section>
+  <!-- LINK -->
+  <section class="card">
+
+    <label for="url">🔗 URL cần xử lý</label>
+
+    <input
+      id="url"
+      type="url"
+      placeholder="https://example.com/..."
+    >
+
+    <div class="row">
+      <button id="check">
+        🔍 Kiểm tra link
+      </button>
+
+      <button id="process">
+        🔗 Xử lý link
+      </button>
+    </div>
+
+    <div id="result" class="result">
+      Chưa có kết quả.
+    </div>
+
+    <div class="small">
+      ⚠️ Chỉ xử lý các chuyển hướng công khai.
+      Không vượt CAPTCHA, Cloudflare, anti-bot, paywall
+      hoặc cơ chế bảo vệ của website.
+    </div>
+
+  </section>
+
+  <!-- CHATBOT -->
+  <section class="card">
+
+    <label>🤖 Chatbot AI</label>
+
+    <div id="chat" class="chat">
+      <div class="msg ai">
+        Xin chào! Gửi cho tôi một URL hoặc đặt câu hỏi về link.
+      </div>
+    </div>
+
+    <textarea
+      id="message"
+      placeholder="Nhập câu hỏi..."
+    ></textarea>
+
+    <div class="row">
+      <button id="send">
+        📤 Gửi
+      </button>
+    </div>
+
+  </section>
+
 </div>
 
 <script>
-const $ = id => document.getElementById(id);
-function addMsg(text, who) {
-  const d = document.createElement("div");
-  d.className = "msg " + who;
-  d.textContent = text;
-  $("chat").appendChild(d);
-  $("chat").scrollTop = $("chat").scrollHeight;
-}
-$("check").onclick = async () => {
-  const url = $("url").value.trim();
-  if (!url) return;
-  $("check").disabled = true;
-  $("result").hidden = false;
-  $("result").textContent = "Đang kiểm tra...";
+
+const urlInput = document.getElementById("url");
+const result = document.getElementById("result");
+const checkButton = document.getElementById("check");
+const processButton = document.getElementById("process");
+
+
+// ==========================
+// KIỂM TRA LINK
+// ==========================
+
+checkButton.onclick = async () => {
+
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    result.textContent = "❌ Vui lòng nhập URL.";
+    return;
+  }
+
+  checkButton.disabled = true;
+  result.textContent = "⏳ Đang kiểm tra...";
+
   try {
-    const r = await fetch("/api/check", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({url})
+
+    const response = await fetch("/api/check", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ url })
     });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.error || "Có lỗi");
-    $("result").textContent =
-      `HTTP: ${data.status}\n${data.message}` +
-      (data.redirectedTo ? `\nĐích chuyển hướng: ${data.redirectedTo}` : "");
-  } catch(e) {
-    $("result").textContent = "Lỗi: " + e.message;
-  } finally { $("check").disabled = false; }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Không thể kiểm tra link.");
+    }
+
+    let text = "";
+
+    text += "📌 Trạng thái: " + data.status + "\n";
+
+    if (data.location) {
+      text += "\n➡️ Link chuyển hướng:\n";
+      text += data.location;
+    }
+
+    if (data.message) {
+      text += "\n\n" + data.message;
+    }
+
+    result.textContent = text;
+
+  } catch (error) {
+
+    result.textContent = "❌ " + error.message;
+
+  } finally {
+
+    checkButton.disabled = false;
+
+  }
+
 };
 
-async function send() {
-  const message = $("message").value.trim();
-  if (!message) return;
-  $("message").value = "";
-  addMsg(message, "user");
-  $("send").disabled = true;
-  addMsg("Đang xử lý...", "bot");
-  const pending = $("chat").lastElementChild;
+
+// ==========================
+// XỬ LÝ LINK CÔNG KHAI
+// ==========================
+
+processButton.onclick = async () => {
+
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    result.textContent = "❌ Vui lòng nhập URL.";
+    return;
+  }
+
+  processButton.disabled = true;
+  result.textContent = "⏳ Đang xử lý các chuyển hướng công khai...";
+
   try {
-    const r = await fetch("/api/chat", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message})
+
+    const response = await fetch("/api/process", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ url })
     });
-    const data = await r.json();
-    pending.textContent = r.ok ? data.answer : ("Lỗi: " + (data.error || "Không xác định"));
-  } catch(e) {
-    pending.textContent = "Không kết nối được máy chủ.";
-  } finally { $("send").disabled = false; }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Không thể xử lý link.");
+    }
+
+    let html = "";
+
+    html += "<b>✅ Đã xử lý link công khai</b><br><br>";
+
+    if (data.finalUrl) {
+
+      html += "<b>🎯 Link đích:</b><br>";
+
+      html += `
+        <a
+          href="${escapeHtml(data.finalUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ${escapeHtml(data.finalUrl)}
+        </a>
+      `;
+
+      html += `
+        <div style="margin-top:12px">
+          <button
+            onclick="window.open('${escapeJs(data.finalUrl)}','_blank')"
+          >
+            🔓 Mở link đích
+          </button>
+        </div>
+      `;
+
+    }
+
+    if (data.steps && data.steps.length) {
+
+      html += "<br><b>📋 Các bước chuyển hướng:</b><br>";
+
+      data.steps.forEach((step, index) => {
+
+        html += `
+          <div style="margin-top:8px">
+            ${index + 1}. ${escapeHtml(step)}
+          </div>
+        `;
+
+      });
+
+    }
+
+    if (data.message) {
+
+      html += `
+        <br>
+        <div>${escapeHtml(data.message)}</div>
+      `;
+
+    }
+
+    result.innerHTML = html;
+
+  } catch (error) {
+
+    result.textContent = "❌ " + error.message;
+
+  } finally {
+
+    processButton.disabled = false;
+
+  }
+
+};
+
+
+// ==========================
+// CHATBOT AI
+// ==========================
+
+const chat = document.getElementById("chat");
+const messageInput = document.getElementById("message");
+const sendButton = document.getElementById("send");
+
+function addMessage(text, type) {
+
+  const div = document.createElement("div");
+
+  div.className = "msg " + type;
+
+  div.textContent = text;
+
+  chat.appendChild(div);
+
+  chat.scrollTop = chat.scrollHeight;
+
 }
-$("send").onclick = send;
-$("message").addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+
+
+sendButton.onclick = async () => {
+
+  const message = messageInput.value.trim();
+
+  if (!message) {
+    return;
+  }
+
+  addMessage(message, "user");
+
+  messageInput.value = "";
+
+  sendButton.disabled = true;
+
+  addMessage("⏳ AI đang trả lời...", "ai");
+
+  const loadingMessage = chat.lastElementChild;
+
+  try {
+
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Chatbot lỗi.");
+    }
+
+    loadingMessage.textContent =
+      data.output || data.message || "Không có phản hồi.";
+
+  } catch (error) {
+
+    loadingMessage.textContent =
+      "❌ " + error.message;
+
+  } finally {
+
+    sendButton.disabled = false;
+
+  }
+
+};
+
+
+// Nhấn Enter để gửi chatbot
+messageInput.addEventListener("keydown", (event) => {
+
+  if (
+    event.key === "Enter" &&
+    !event.shiftKey
+  ) {
+
+    event.preventDefault();
+
+    sendButton.click();
+
+  }
+
 });
+
+
+// ==========================
+// BẢO VỆ HIỂN THỊ HTML
+// ==========================
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+function escapeJs(value) {
+
+  return String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r");
+
+}
+
 </script>
+
 </body>
 </html>
