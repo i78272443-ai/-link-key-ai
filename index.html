@@ -1,297 +1,246 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Link Key AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Link Key AI</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f2f4f7;
+  color:#111;
+}
+.container{
+  max-width:760px;
+  margin:auto;
+  padding:20px;
+}
+header{text-align:center;margin-bottom:20px}
+header h1{margin-bottom:8px}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-    }
+.card{
+  background:white;
+  padding:18px;
+  border-radius:16px;
+  margin-bottom:18px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
 
-    .wrap {
-      max-width: 760px;
-      margin: auto;
-      padding: 20px;
-    }
+label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:8px;
+}
 
-    header {
-      text-align: center;
-      padding: 15px 0 20px;
-    }
+input,textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:15px;
+}
 
-    header h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-    }
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
 
-    header p {
-      margin: 0;
-      color: #666;
-    }
+.buttons{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
 
-    .card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 18px;
-      box-shadow: 0 3px 12px rgba(0,0,0,.05);
-    }
+button{
+  flex:1;
+  padding:13px;
+  border:0;
+  border-radius:10px;
+  background:#111827;
+  color:white;
+  font-weight:bold;
+  font-size:15px;
+}
 
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+button:disabled{opacity:.5}
 
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 15px;
-      outline: none;
-    }
+.result{
+  margin-top:15px;
+  padding:13px;
+  background:#f7f7f7;
+  border-radius:10px;
+  word-break:break-word;
+  line-height:1.5;
+}
 
-    input:focus,
-    textarea:focus {
-      border-color: #6366f1;
-    }
+.chat{
+  min-height:180px;
+  max-height:350px;
+  overflow:auto;
+  padding:10px;
+  background:#f7f7f7;
+  border-radius:10px;
+  margin-bottom:12px;
+}
 
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
+.msg{
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:8px;
+  white-space:pre-wrap;
+}
 
-    .row {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-    }
+.user{background:#e5e7eb}
+.ai{background:#eef2ff}
 
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      background: #111827;
-      color: white;
-      flex: 1;
-    }
+a{
+  color:#2563eb;
+  word-break:break-all;
+}
 
-    button:hover {
-      opacity: .9;
-    }
+.note{
+  font-size:13px;
+  color:#666;
+  margin-top:10px;
+}
 
-    button:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .result {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #f9fafb;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .chat {
-      min-height: 180px;
-      max-height: 360px;
-      overflow-y: auto;
-      padding: 10px;
-      background: #f9fafb;
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
-
-    .msg {
-      padding: 10px 12px;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      line-height: 1.4;
-    }
-
-    .user {
-      background: #e5e7eb;
-    }
-
-    .ai {
-      background: #eef2ff;
-    }
-
-    .small {
-      font-size: 13px;
-      color: #777;
-      margin-top: 10px;
-      line-height: 1.4;
-    }
-
-    a {
-      color: #2563eb;
-      word-break: break-all;
-    }
-
-    @media (max-width: 560px) {
-      .wrap {
-        padding: 12px;
-      }
-
-      .row {
-        flex-direction: column;
-      }
-
-      header h1 {
-        font-size: 26px;
-      }
-    }
-  </style>
+@media(max-width:600px){
+  .container{padding:12px}
+  .buttons{flex-direction:column}
+}
+</style>
 </head>
 
 <body>
 
-<div class="wrap">
+<div class="container">
 
-  <header>
-    <h1>🔗 Link Key AI</h1>
-    <p>Kiểm tra và xử lý chuyển hướng link công khai</p>
-  </header>
+<header>
+<h1>🔗 Link Key AI</h1>
+<p>Kiểm tra và xử lý link công khai</p>
+</header>
 
-  <!-- LINK -->
-  <section class="card">
+<!-- LINK -->
+<div class="card">
 
-    <label for="url">🔗 URL cần xử lý</label>
+<label>🔗 URL cần xử lý</label>
 
-    <input
-      id="url"
-      type="url"
-      placeholder="https://example.com/..."
-    >
+<input
+  id="url"
+  type="url"
+  placeholder="Dán link FunLink, Linkvertise hoặc URL khác..."
+>
 
-    <div class="row">
-      <button id="check">
-        🔍 Kiểm tra link
-      </button>
+<div class="buttons">
 
-      <button id="process">
-        🔗 Xử lý link
-      </button>
-    </div>
+<button id="check">
+🔍 Kiểm tra link
+</button>
 
-    <div id="result" class="result">
-      Chưa có kết quả.
-    </div>
-
-    <div class="small">
-      ⚠️ Chỉ xử lý các chuyển hướng công khai.
-      Không vượt CAPTCHA, Cloudflare, anti-bot, paywall
-      hoặc cơ chế bảo vệ của website.
-    </div>
-
-  </section>
-
-  <!-- CHATBOT -->
-  <section class="card">
-
-    <label>🤖 Chatbot AI</label>
-
-    <div id="chat" class="chat">
-      <div class="msg ai">
-        Xin chào! Gửi cho tôi một URL hoặc đặt câu hỏi về link.
-      </div>
-    </div>
-
-    <textarea
-      id="message"
-      placeholder="Nhập câu hỏi..."
-    ></textarea>
-
-    <div class="row">
-      <button id="send">
-        📤 Gửi
-      </button>
-    </div>
-
-  </section>
+<button id="process">
+🔗 Xử lý link
+</button>
 
 </div>
+
+<div id="result" class="result">
+Chưa có kết quả.
+</div>
+
+<div class="note">
+⚠️ Chỉ xử lý chuyển hướng công khai. CAPTCHA, Cloudflare,
+anti-bot và các cơ chế bảo vệ cần được thực hiện thủ công.
+</div>
+
+</div>
+
+
+<!-- CHATBOT -->
+
+<div class="card">
+
+<label>🤖 Chatbot AI</label>
+
+<div id="chat" class="chat">
+
+<div class="msg ai">
+Xin chào! 👋
+Bạn có thể gửi URL hoặc hỏi tôi về một link.
+</div>
+
+</div>
+
+<textarea
+  id="message"
+  placeholder="Nhập câu hỏi..."
+></textarea>
+
+<div class="buttons">
+<button id="send">📤 Gửi</button>
+</div>
+
+</div>
+
+</div>
+
 
 <script>
 
 const urlInput = document.getElementById("url");
 const result = document.getElementById("result");
-const checkButton = document.getElementById("check");
-const processButton = document.getElementById("process");
 
 
 // ==========================
 // KIỂM TRA LINK
 // ==========================
 
-checkButton.onclick = async () => {
+document.getElementById("check").onclick = async () => {
 
   const url = urlInput.value.trim();
 
-  if (!url) {
+  if(!url){
     result.textContent = "❌ Vui lòng nhập URL.";
     return;
   }
 
-  checkButton.disabled = true;
   result.textContent = "⏳ Đang kiểm tra...";
 
-  try {
+  try{
 
-    const response = await fetch("/api/check", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+    const res = await fetch("/api/check",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
       },
-      body: JSON.stringify({ url })
+      body:JSON.stringify({url})
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || "Không thể kiểm tra link.");
-    }
+    if(!res.ok)
+      throw new Error(data.error || "Không thể kiểm tra.");
 
-    let text = "";
+    result.innerHTML = `
+      <b>📌 Trạng thái:</b> ${data.status || "Không rõ"}
+      <br><br>
+      ${
+        data.location
+        ? `<b>➡️ Redirect:</b><br>
+           <a href="${data.location}" target="_blank">
+           ${data.location}
+           </a>`
+        : "Không có redirect công khai."
+      }
+      <br><br>
+      ${data.message || ""}
+    `;
 
-    text += "📌 Trạng thái: " + data.status + "\n";
+  }catch(err){
 
-    if (data.location) {
-      text += "\n➡️ Link chuyển hướng:\n";
-      text += data.location;
-    }
-
-    if (data.message) {
-      text += "\n\n" + data.message;
-    }
-
-    result.textContent = text;
-
-  } catch (error) {
-
-    result.textContent = "❌ " + error.message;
-
-  } finally {
-
-    checkButton.disabled = false;
+    result.textContent = "❌ " + err.message;
 
   }
 
@@ -302,98 +251,76 @@ checkButton.onclick = async () => {
 // XỬ LÝ LINK CÔNG KHAI
 // ==========================
 
-processButton.onclick = async () => {
+document.getElementById("process").onclick = async () => {
 
   const url = urlInput.value.trim();
 
-  if (!url) {
+  if(!url){
     result.textContent = "❌ Vui lòng nhập URL.";
     return;
   }
 
-  processButton.disabled = true;
-  result.textContent = "⏳ Đang xử lý các chuyển hướng công khai...";
+  result.textContent =
+    "⏳ Đang xử lý các redirect công khai...";
 
-  try {
+  try{
 
-    const response = await fetch("/api/process", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+    const res = await fetch("/api/process",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
       },
-      body: JSON.stringify({ url })
+      body:JSON.stringify({url})
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
-    if (!response.ok) {
+    if(!res.ok)
       throw new Error(data.error || "Không thể xử lý link.");
-    }
 
-    let html = "";
+    let html = `
+      <b>✅ Đã xử lý link công khai</b><br><br>
+    `;
 
-    html += "<b>✅ Đã xử lý link công khai</b><br><br>";
-
-    if (data.finalUrl) {
-
-      html += "<b>🎯 Link đích:</b><br>";
+    if(data.finalUrl){
 
       html += `
-        <a
-          href="${escapeHtml(data.finalUrl)}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          ${escapeHtml(data.finalUrl)}
+        <b>🎯 Link đích:</b><br>
+        <a href="${data.finalUrl}"
+           target="_blank"
+           rel="noopener noreferrer">
+           ${data.finalUrl}
         </a>
-      `;
+        <br><br>
 
-      html += `
-        <div style="margin-top:12px">
-          <button
-            onclick="window.open('${escapeJs(data.finalUrl)}','_blank')"
-          >
-            🔓 Mở link đích
-          </button>
-        </div>
+        <button onclick="window.open('${data.finalUrl}','_blank')">
+          🔓 Mở link đích
+        </button>
       `;
-
     }
 
-    if (data.steps && data.steps.length) {
+    if(data.steps && data.steps.length){
 
-      html += "<br><b>📋 Các bước chuyển hướng:</b><br>";
+      html += `
+        <br><br>
+        <b>📋 Các bước redirect:</b><br>
+      `;
 
-      data.steps.forEach((step, index) => {
-
-        html += `
-          <div style="margin-top:8px">
-            ${index + 1}. ${escapeHtml(step)}
-          </div>
-        `;
-
+      data.steps.forEach((step,i)=>{
+        html += `${i+1}. ${step}<br>`;
       });
 
     }
 
-    if (data.message) {
-
-      html += `
-        <br>
-        <div>${escapeHtml(data.message)}</div>
-      `;
-
+    if(data.message){
+      html += `<br>${data.message}`;
     }
 
     result.innerHTML = html;
 
-  } catch (error) {
+  }catch(err){
 
-    result.textContent = "❌ " + error.message;
-
-  } finally {
-
-    processButton.disabled = false;
+    result.textContent = "❌ " + err.message;
 
   }
 
@@ -405,119 +332,81 @@ processButton.onclick = async () => {
 // ==========================
 
 const chat = document.getElementById("chat");
-const messageInput = document.getElementById("message");
-const sendButton = document.getElementById("send");
+const message = document.getElementById("message");
+const send = document.getElementById("send");
 
-function addMessage(text, type) {
+function addMessage(text,type){
 
   const div = document.createElement("div");
 
   div.className = "msg " + type;
-
   div.textContent = text;
 
   chat.appendChild(div);
-
   chat.scrollTop = chat.scrollHeight;
-
 }
 
+send.onclick = async () => {
 
-sendButton.onclick = async () => {
+  const text = message.value.trim();
 
-  const message = messageInput.value.trim();
+  if(!text) return;
 
-  if (!message) {
-    return;
-  }
+  addMessage(text,"user");
 
-  addMessage(message, "user");
+  message.value = "";
 
-  messageInput.value = "";
+  send.disabled = true;
 
-  sendButton.disabled = true;
+  const loading = document.createElement("div");
+  loading.className = "msg ai";
+  loading.textContent = "⏳ AI đang trả lời...";
+  chat.appendChild(loading);
 
-  addMessage("⏳ AI đang trả lời...", "ai");
+  try{
 
-  const loadingMessage = chat.lastElementChild;
-
-  try {
-
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+    const res = await fetch("/api/chat",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
       },
-      body: JSON.stringify({
-        message
+      body:JSON.stringify({
+        message:text
       })
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
-    if (!response.ok) {
+    if(!res.ok)
       throw new Error(data.error || "Chatbot lỗi.");
-    }
 
-    loadingMessage.textContent =
-      data.output || data.message || "Không có phản hồi.";
+    loading.textContent =
+      data.output ||
+      data.message ||
+      "Không có phản hồi.";
 
-  } catch (error) {
+  }catch(err){
 
-    loadingMessage.textContent =
-      "❌ " + error.message;
-
-  } finally {
-
-    sendButton.disabled = false;
+    loading.textContent = "❌ " + err.message;
 
   }
+
+  send.disabled = false;
 
 };
 
 
-// Nhấn Enter để gửi chatbot
-messageInput.addEventListener("keydown", (event) => {
+// Enter để gửi
+message.addEventListener("keydown",(e)=>{
 
-  if (
-    event.key === "Enter" &&
-    !event.shiftKey
-  ) {
+  if(e.key === "Enter" && !e.shiftKey){
 
-    event.preventDefault();
-
-    sendButton.click();
+    e.preventDefault();
+    send.click();
 
   }
 
 });
-
-
-// ==========================
-// BẢO VỆ HIỂN THỊ HTML
-// ==========================
-
-function escapeHtml(value) {
-
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-
-
-function escapeJs(value) {
-
-  return String(value)
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r");
-
-}
 
 </script>
 
