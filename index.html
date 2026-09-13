@@ -1,181 +1,595 @@
-require("dotenv").config();
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const express = require("express");
-const OpenAI = require("openai");
+<title>Link Key AI</title>
 
-const app = express();
-const port = process.env.PORT || 3000;
+<style>
+* {
+  box-sizing: border-box;
+}
 
-app.use(express.json());
-app.use(express.static(__dirname));
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f3f5f9;
+  color: #111827;
+}
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+.container {
+  max-width: 760px;
+  margin: auto;
+  padding: 25px 14px 50px;
+}
 
-// Trang chính
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
+.header {
+  text-align: center;
+  padding: 15px 0 25px;
+}
 
-function validUrl(value) {
-  try {
-    const u = new URL(value);
-    return u.protocol === "http:" || u.protocol === "https:";
-  } catch {
-    return false;
+.header h1 {
+  font-size: 36px;
+  margin: 0;
+}
+
+.header p {
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.card {
+  background: white;
+  border-radius: 22px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 25px rgba(0,0,0,.06);
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #d9dde5;
+  border-radius: 14px;
+  font-size: 16px;
+  outline: none;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+button {
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  color: white;
+  background: #3867e8;
+  flex: 1;
+}
+
+button.dark {
+  background: #111827;
+}
+
+button.green {
+  background: #168a4a;
+}
+
+button:disabled {
+  opacity: .55;
+}
+
+.result {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 14px;
+  background: #f1f3f6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.result a {
+  color: #2457d6;
+  font-weight: 700;
+  word-break: break-all;
+}
+
+.notice {
+  margin-top: 12px;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.hidden {
+  display: none;
+}
+
+.chat {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #f7f8fa;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.msg {
+  padding: 10px 13px;
+  border-radius: 14px;
+  margin: 8px 0;
+  white-space: pre-wrap;
+}
+
+.bot {
+  background: #e9ebef;
+  margin-right: 15%;
+}
+
+.user {
+  background: #dbe6ff;
+  margin-left: 15%;
+}
+
+@media (max-width: 560px) {
+  .buttons {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .header h1 {
+    font-size: 30px;
   }
 }
+</style>
+</head>
 
-// Kiểm tra 1 redirect công khai
-async function getRedirect(url) {
-  const response = await fetch(url, {
-    method: "GET",
-    redirect: "manual",
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
-    }
-  });
+<body>
 
-  const location = response.headers.get("location");
+<div class="container">
 
-  return {
-    status: response.status,
-    location
-  };
+  <div class="header">
+    <h1>🔗 Link Key AI</h1>
+    <p>Kiểm tra và xử lý link công khai</p>
+  </div>
+
+  <!-- LINK -->
+  <div class="card">
+
+    <label>🔗 Link cần xử lý</label>
+
+    <input
+      id="url"
+      type="url"
+      placeholder="Dán link FunLink, Linkvertise hoặc link khác..."
+    >
+
+    <div class="buttons">
+      <button id="check">
+        🔎 Kiểm tra
+      </button>
+
+      <button id="process" class="dark">
+        🔑 Lấy mã / Xử lý link
+      </button>
+    </div>
+
+    <div id="result" class="result hidden"></div>
+
+    <!-- Xác minh thủ công -->
+    <div id="verifyBox" class="hidden">
+
+      <div class="result">
+
+        <b>🛡️ Cần xác minh</b>
+
+        <p>
+          Website có thể yêu cầu CAPTCHA hoặc xác minh người dùng.
+          Hãy mở link bên dưới và tự hoàn thành bước xác minh.
+        </p>
+
+        <button id="openVerify" class="dark">
+          🌐 Mở trang để xác minh
+        </button>
+
+        <button id="verified" class="green" style="margin-top:10px">
+          ✅ Tôi đã xác minh
+        </button>
+
+      </div>
+
+    </div>
+
+    <p class="notice">
+      CAPTCHA/anti-bot được xác minh thủ công trên website gốc.
+      Hệ thống chỉ tiếp tục các redirect công khai mà website cho phép.
+    </p>
+
+  </div>
+
+
+  <!-- CHATBOT -->
+  <div class="card">
+
+    <label>🤖 Chatbot AI</label>
+
+    <div id="chat" class="chat">
+      <div class="msg bot">
+        Xin chào! Gửi URL hoặc hỏi mình về link.
+      </div>
+    </div>
+
+    <textarea
+      id="message"
+      placeholder="Hỏi AI về link..."
+    ></textarea>
+
+    <button
+      id="send"
+      style="margin-top:10px"
+    >
+      Gửi
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const $ = id => document.getElementById(id);
+
+let currentUrl = "";
+
+
+/* Hiển thị kết quả */
+
+function showResult(text) {
+  $("result").classList.remove("hidden");
+  $("result").innerHTML = text;
 }
 
-// Kiểm tra link
-app.post("/api/check", async (req, res) => {
-  try {
-    const { url } = req.body;
 
-    if (!validUrl(url)) {
-      return res.status(400).json({
-        error: "URL không hợp lệ."
-      });
+/* KIỂM TRA */
+
+$("check").onclick = async () => {
+
+  const url = $("url").value.trim();
+
+  if (!url) {
+    alert("Hãy nhập link.");
+    return;
+  }
+
+  currentUrl = url;
+
+  $("check").disabled = true;
+
+  showResult("⏳ Đang kiểm tra link...");
+
+  try {
+
+    const response = await fetch("/api/check", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({ url })
+
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Có lỗi");
     }
 
-    const result = await getRedirect(url);
+    let text =
+      "HTTP: " + data.status +
+      "\n\n" +
+      data.message;
 
-    res.json({
-      status: result.status,
-      redirectedTo: result.location || null,
-      message: result.location
-        ? "Link có chuyển hướng công khai."
-        : "Không tìm thấy chuyển hướng công khai."
-    });
+    if (data.redirectedTo) {
+
+      text +=
+        "\n\n🔗 Link tiếp theo:\n" +
+        data.redirectedTo;
+
+    }
+
+    showResult(text);
+
   } catch (error) {
-    res.status(500).json({
-      error: "Không thể kiểm tra link này."
-    });
+
+    showResult(
+      "❌ " + error.message +
+      "\n\nNếu website yêu cầu CAPTCHA/anti-bot, hãy dùng nút Xử lý link."
+    );
+
+    $("verifyBox").classList.remove("hidden");
+
+  } finally {
+
+    $("check").disabled = false;
+
   }
-});
+};
 
-// Xử lý chuỗi redirect công khai
-app.post("/api/process", async (req, res) => {
+
+/* XỬ LÝ LINK */
+
+$("process").onclick = async () => {
+
+  const url = $("url").value.trim();
+
+  if (!url) {
+    alert("Hãy nhập link.");
+    return;
+  }
+
+  currentUrl = url;
+
+  $("process").disabled = true;
+
+  $("verifyBox").classList.add("hidden");
+
+  showResult("⏳ Đang xử lý các redirect công khai...");
+
   try {
-    let currentUrl = req.body.url;
 
-    if (!validUrl(currentUrl)) {
-      return res.status(400).json({
-        error: "URL không hợp lệ."
-      });
+    const response = await fetch("/api/process", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({ url })
+
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Không xử lý được link.");
     }
 
-    const steps = [];
-    const maxRedirects = 5;
+    if (data.finalUrl) {
 
-    for (let i = 0; i < maxRedirects; i++) {
-      const result = await getRedirect(currentUrl);
+      currentUrl = data.finalUrl;
 
-      steps.push({
-        url: currentUrl,
-        status: result.status,
-        next: result.location || null
-      });
+      showResult(
+        "✅ Đã xử lý redirect công khai.\n\n" +
+        "🔗 Link hiện tại:\n" +
+        data.finalUrl +
+        "\n\n" +
+        "Bạn có thể mở link này để tiếp tục."
+      );
 
-      if (!result.location) {
-        return res.json({
-          success: true,
-          finalUrl: currentUrl,
-          steps,
-          captcha: false,
-          message: "Đã xử lý xong các chuyển hướng công khai."
-        });
+      $("verifyBox").classList.add("hidden");
+
+    }
+
+  } catch (error) {
+
+    showResult(
+      "🛡️ Link có thể yêu cầu CAPTCHA, anti-bot hoặc xác minh người dùng.\n\n" +
+      "Hãy mở link để xác minh thủ công."
+    );
+
+    currentUrl = url;
+
+    $("verifyBox").classList.remove("hidden");
+
+  } finally {
+
+    $("process").disabled = false;
+
+  }
+};
+
+
+/* MỞ TRANG XÁC MINH */
+
+$("openVerify").onclick = () => {
+
+  if (!currentUrl) return;
+
+  window.open(
+    currentUrl,
+    "_blank"
+  );
+
+};
+
+
+/* SAU KHI NGƯỜI DÙNG XÁC MINH */
+
+$("verified").onclick = async () => {
+
+  if (!currentUrl) return;
+
+  $("verifyBox").classList.add("hidden");
+
+  showResult(
+    "🔄 Đang kiểm tra lại link sau khi bạn xác minh..."
+  );
+
+  try {
+
+    const response = await fetch("/api/process", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        url: currentUrl
+      })
+
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Chưa thể tiếp tục."
+      );
+    }
+
+    if (data.finalUrl) {
+
+      currentUrl = data.finalUrl;
+
+      showResult(
+        "✅ Đã kiểm tra lại.\n\n" +
+        "🔗 Link đích công khai:\n" +
+        data.finalUrl
+      );
+
+    }
+
+  } catch (error) {
+
+    showResult(
+      "⚠️ Máy chủ vẫn không thể truy cập redirect này.\n\n" +
+      "Website có thể yêu cầu session/cookie hoặc cơ chế bảo vệ chỉ hoạt động trong trình duyệt."
+    );
+
+  }
+
+};
+
+
+/* CHATBOT */
+
+function addMessage(text, type) {
+
+  const div = document.createElement("div");
+
+  div.className = "msg " + type;
+
+  div.textContent = text;
+
+  $("chat").appendChild(div);
+
+  $("chat").scrollTop =
+    $("chat").scrollHeight;
+}
+
+
+async function sendMessage() {
+
+  const message =
+    $("message").value.trim();
+
+  if (!message) return;
+
+  $("message").value = "";
+
+  addMessage(message, "user");
+
+  addMessage(
+    "⏳ Đang xử lý...",
+    "bot"
+  );
+
+  const pending =
+    $("chat").lastElementChild;
+
+  $("send").disabled = true;
+
+  try {
+
+    const response = await fetch(
+      "/api/chat",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          message
+        })
       }
+    );
 
-      currentUrl = new URL(
-        result.location,
-        currentUrl
-      ).toString();
+    const data =
+      await response.json();
+
+    pending.textContent =
+      response.ok
+        ? data.answer
+        : "❌ " +
+          (data.error || "Có lỗi.");
+
+  } catch (error) {
+
+    pending.textContent =
+      "❌ Không kết nối được máy chủ.";
+
+  } finally {
+
+    $("send").disabled = false;
+
+  }
+}
+
+
+$("send").onclick = sendMessage;
+
+
+$("message").addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+
+      event.preventDefault();
+
+      sendMessage();
+
     }
 
-    res.json({
-      success: true,
-      finalUrl: currentUrl,
-      steps,
-      captcha: false,
-      message:
-        "Đã đi qua giới hạn redirect công khai. Có thể tiếp tục kiểm tra từ URL này."
-    });
-  } catch (error) {
-    res.status(500).json({
-      error:
-        "Trang yêu cầu xác minh người dùng, CAPTCHA hoặc cơ chế bảo vệ mà máy chủ không thể tự xử lý."
-    });
   }
-});
+);
 
-// Chatbot AI
-app.post("/api/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
+</script>
 
-    if (!message) {
-      return res.status(400).json({
-        error: "Thiếu nội dung."
-      });
-    }
-
-    const response = await openai.responses.create({
-      model: "gpt-5-mini",
-      instructions: `
-Bạn là Link Key AI.
-
-Bạn hỗ trợ người dùng:
-- phân tích URL;
-- giải thích redirect;
-- hướng dẫn xử lý link công khai;
-- hướng dẫn người dùng tự hoàn thành CAPTCHA hoặc xác minh người dùng.
-
-Không hướng dẫn:
-- bypass CAPTCHA;
-- đánh cắp hoặc giả lập CAPTCHA token;
-- vượt Cloudflare/anti-bot;
-- đánh cắp cookie/session;
-- vượt paywall;
-- phá cơ chế kiểm soát truy cập.
-
-Nếu gặp CAPTCHA hoặc anti-bot, hướng dẫn người dùng mở website và tự xác minh,
-sau đó tiếp tục bằng những bước công khai mà website cho phép.
-      `,
-      input: message
-    });
-
-    res.json({
-      answer: response.output_text
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Chatbot đang gặp lỗi."
-    });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Link Key AI running on port ${port}`);
-});
+</body>
+</html>
